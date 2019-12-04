@@ -4,7 +4,7 @@ from lowpass import LowPassFilter
 from yaw_controller import YawController
 GAS_DENSITY = 2.858
 ONE_MPH = 0.44704
-
+DECEL_FACTOR = 0.13 # a magic number makes braking smoother
 
 class Controller(object):
 	def __init__(self, vehicle_mass, fuel_capacity, brake_deadband, 
@@ -17,7 +17,7 @@ class Controller(object):
 		Ki = 0.1
 		Kd = 0.0
 		mn = 0.0 #min throttle
-		mx = 0.2 #max throttle
+		mx = 0.3 #max throttle
 		self.throttle_controller = PID(Kp, Ki, Kd, mn, mx)
 		
 		tau = 0.5 #1/(2pi*tau) = cutoff freq
@@ -54,15 +54,14 @@ class Controller(object):
 		throttle = self.throttle_controller.step(vel_error, sample_time)
 		brake = 0
 		
-		if linear_vel == 0.0 and current_vel < 0.1:
+		if linear_vel == 0.0 and current_vel < 0.2:
 			throttle = 0
 			brake = 700
 		
 		elif throttle < 0.1 and vel_error < 0:
 			throttle = 0
-			decel = max(vel_error, self.decel_limit)
+			decel = max(DECEL_FACTOR*vel_error, self.decel_limit)
 			brake = abs(decel)*self.vehicle_mass*self.wheel_radius
 			
 		#return 1., 0., 0.
 		return throttle, brake, steering
-
