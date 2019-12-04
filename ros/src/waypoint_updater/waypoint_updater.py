@@ -24,9 +24,9 @@ as well as to verify your TL classifier.
 TODO (for Yousuf and Aaron): Stopline location for each traffic light.
 '''
 
-LOOKAHEAD_WPS = 50 # Number of waypoints we will publish. You can change this number
-MAX_DECEL = 0.3
-MIN_STOP_TIME = 2.5 #minimum brake time
+LOOKAHEAD_WPS = 100 # Number of waypoints we will publish. You can change this number
+MAX_DECEL = 0.35
+MIN_STOP_TIME = 3.5 #minimum brake time
 
 class WaypointUpdater(object):
 	def __init__(self):
@@ -94,7 +94,7 @@ class WaypointUpdater(object):
 	def generate_lane(self):
 		lane = Lane()
 		closest_idx = self.get_closest_waypoint_idx()
-		farthest_idx = closest_idx + LOOKAHEAD_WPS*2
+		farthest_idx = closest_idx + LOOKAHEAD_WPS
 		new_base_waypoints = self.base_waypoints.waypoints[closest_idx:farthest_idx]
 		if self.stopline_wp_idx == -1 or (self.stopline_wp_idx >= farthest_idx):
 			lane.waypoints = new_base_waypoints
@@ -114,10 +114,10 @@ class WaypointUpdater(object):
 		
 			p = Waypoint()
 			p.pose = wp.pose
-			#two waypoints back from line so front of the car stops at line
-			stop_idx = max(self.stopline_wp_idx - closest_idx - 3, 0)
+			#four waypoints back from line so front of the car stops at line
+			stop_idx = max(self.stopline_wp_idx - closest_idx - 4, 0)
 			dist = self.distance(waypoints, i, stop_idx)
-			#vel = math.sqrt(2*MAX_DECEL*dist)
+			#vel = math.sqrt(3*dist)
 			vel = MAX_DECEL*dist
 			#vel = 3.0
 			if vel < 1.0:
@@ -177,5 +177,3 @@ if __name__ == '__main__':
 		WaypointUpdater()
 	except rospy.ROSInterruptException:
 		rospy.logerr('Could not start waypoint updater node.')
-
-
