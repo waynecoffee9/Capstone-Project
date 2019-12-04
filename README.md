@@ -25,3 +25,6 @@ source devel/setup.sh
 roslaunch launch/styx.launch
 ```
 4. Run the simulator
+
+## Status
+The car can run and stop at red light with ground truth red light signal from the simulator.  Next step is to train a model to classify the lights.
