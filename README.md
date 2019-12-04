@@ -1,5 +1,13 @@
 ## Work In Progress
 
+## The TEAM
+
+1. Kibaek Jeong
+2. Danfeng Xu
+3. Roopak Ingole
+4. Ying Tang
+5. Wayne Chen
+
 ### Usage
 
 1. Clone the project repository
