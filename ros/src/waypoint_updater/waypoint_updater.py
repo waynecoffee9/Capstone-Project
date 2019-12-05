@@ -25,12 +25,13 @@ TODO (for Yousuf and Aaron): Stopline location for each traffic light.
 '''
 
 LOOKAHEAD_WPS = 100 # Number of waypoints we will publish. You can change this number
-MAX_DECEL = 0.35
+MAX_DECEL = 0.35 #max deceleration factor used to update waypoints
 MIN_STOP_TIME = 2.5 #minimum brake time
 
 class WaypointUpdater(object):
 	def __init__(self):
 		rospy.init_node('waypoint_updater')
+		# wait for message before initializing rest of the code.
 		rospy.wait_for_message('/current_pose', PoseStamped)
 		rospy.wait_for_message('/base_waypoints', Lane)
 		rospy.Subscriber('/current_pose', PoseStamped, self.pose_cb)
@@ -56,7 +57,7 @@ class WaypointUpdater(object):
 		rospy.spin()
 
 	def loop(self):
-		rate = rospy.Rate(15)
+		rate = rospy.Rate(15) #15Hz
 		while not rospy.is_shutdown():
 			if self.pose and self.base_waypoints:
 				#get closest waypoint
@@ -87,7 +88,7 @@ class WaypointUpdater(object):
 	def publish_waypoints(self, closest_idx):
 		final_lane = self.generate_lane()
 		final_lane.header = self.base_waypoints.header
-		#final_lane.waypoints = self.base_waypoints.waypoints[closest_idx:closest_idx + LOOKAHEAD_WPS]
+		# pick every other waypoint to reduce overhead computing
 		final_lane.waypoints = final_lane.waypoints[0::2]
 		self.final_waypoints_pub.publish(final_lane)
 
@@ -95,11 +96,18 @@ class WaypointUpdater(object):
 		lane = Lane()
 		closest_idx = self.get_closest_waypoint_idx()
 		farthest_idx = closest_idx + LOOKAHEAD_WPS
+		# division later, make sure current_vel is not zero.
+		if self.current_vel < 0.1:
+			non_zero_current_vel = 0.1
+		else: non_zero_current_vel = self.current_vel
+		#we just need subset of the entire waypoint set.
 		new_base_waypoints = self.base_waypoints.waypoints[closest_idx:farthest_idx]
+		#conditions for intersections (traffic lights). If they are too far, 
+		#ingore them, if they are close and they are red, update waypoints with reducing velocity
 		if self.stopline_wp_idx == -1 or (self.stopline_wp_idx >= farthest_idx):
 			lane.waypoints = new_base_waypoints
 			self.is_braking = False
-		elif self.distance(self.base_waypoints.waypoints, closest_idx, self.stopline_wp_idx)/self.current_vel < MIN_STOP_TIME and self.is_braking == False:
+		elif self.distance(self.base_waypoints.waypoints, closest_idx, self.stopline_wp_idx)/non_zero_current_vel < MIN_STOP_TIME and self.is_braking == False:
 			lane.waypoints = new_base_waypoints
 		else:
 			lane.waypoints = self.decelerate_waypoints(new_base_waypoints, closest_idx)
@@ -118,8 +126,9 @@ class WaypointUpdater(object):
 			stop_idx = max(self.stopline_wp_idx - closest_idx - 4, 0)
 			dist = self.distance(waypoints, i, stop_idx)
 			#vel = math.sqrt(3*dist)
+			#use simple multiplication is enough.
 			vel = MAX_DECEL*dist
-			#vel = 3.0
+			#if velocity is low, set to zero
 			if vel < 1.0:
 				vel = 0.0
 			
@@ -144,6 +153,7 @@ class WaypointUpdater(object):
 			self.waypoint_tree = KDTree(self.waypoints_2d)
 		if self.base_waypoints == None:
 			self.base_waypoints = waypoints
+		# base waypoints only needs to be called once, so we can stop subscribing from the topic once we have them
 		if self.base_waypoints and self.waypoints_2d:
 			self.base_waypoints_sub.unregister()
 		pass
