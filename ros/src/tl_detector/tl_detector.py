@@ -8,12 +8,11 @@ from sensor_msgs.msg import Image
 from cv_bridge import CvBridge
 from light_classification.tl_classifier import TLClassifier
 from scipy.spatial import KDTree
-import time
 import tf
 import cv2
 import yaml
 
-STATE_COUNT_THRESHOLD = 3
+STATE_COUNT_THRESHOLD = 3 # consecutive traffic light state change
 
 class TLDetector(object):
 	def __init__(self):
@@ -24,6 +23,7 @@ class TLDetector(object):
 		self.waypoints_2d = None
 		self.waypoint_tree = None
 		self.camera_image = None
+		self.has_image = False
 		self.img_count = 0
 		self.lights = []
 
@@ -78,6 +78,7 @@ class TLDetector(object):
 		"""
 		#rate = rospy.Rate(30)
 		#while not rospy.is_shutdown():
+		rospy.wait_for_message('/base_waypoints', Lane)
 		self.has_image = True
 		self.camera_image = msg
 		light_wp, state = self.process_traffic_lights()
@@ -93,6 +94,7 @@ class TLDetector(object):
 			self.state = state
 		elif self.state_count >= STATE_COUNT_THRESHOLD:
 			self.last_state = self.state
+			#safe driving. If we see yellow light, report it as well
 			if state == TrafficLight.RED or state == TrafficLight.YELLOW:
 				light_wp = light_wp
 			else: light_wp = -1
@@ -128,8 +130,8 @@ class TLDetector(object):
 		"""
 		
 		if(not self.has_image):
-			self.prev_light_loc = None
-			return False
+			#self.prev_light_loc = None
+			return TrafficLight.UNKNOWN
 
 		#Get classification
 		#return self.light_classifier.get_classification(cv_image)
