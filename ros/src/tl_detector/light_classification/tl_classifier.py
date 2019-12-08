@@ -107,7 +107,7 @@ class TLClassifier(object):
         """
 
         with self.dg.as_default():
-            #switch from BGR to RGB. Important otherwise detection won't work
+            #switch from RGB to BGR. Important otherwise detection won't work
             image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
 
             tf_image_input = np.expand_dims(image,axis=0)
@@ -122,9 +122,8 @@ class TLClassifier(object):
 
 
             ret = None
-            detection_threshold = 0.3
 
-            confidence_cutoff = 0.6
+            confidence_cutoff = 0.3
             # Filter boxes with a confidence score less than `confidence_cutoff`
             boxes, scores, classes = self.filter_boxes(confidence_cutoff, detection_boxes, detection_scores, detection_classes)
 
