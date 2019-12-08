@@ -44,9 +44,10 @@ class TLDetector(object):
 		self.config = yaml.load(config_string)
 
 		self.upcoming_red_light_pub = rospy.Publisher('/traffic_waypoint', Int32, queue_size=1)
+        self.is_site = self.config['is_site']
 
 		self.bridge = CvBridge()
-		self.light_classifier = TLClassifier()
+		self.light_classifier = TLClassifier(self.is_site)
 		self.listener = tf.TransformListener()
 
 		self.state = TrafficLight.UNKNOWN
@@ -129,15 +130,19 @@ class TLDetector(object):
 
 		"""
 		
-		if(not self.has_image):
-			#self.prev_light_loc = None
-			return TrafficLight.UNKNOWN
+        if(not self.has_image):
+            self.prev_light_loc = None
+            return False
 
-		#Get classification
-		#return self.light_classifier.get_classification(cv_image)
+        cv_image = self.bridge.imgmsg_to_cv2(self.camera_image, "bgr8")
+
+        #Get classification
+		state = self.light_classifier.get_classification(cv_image)
+		#print(str(light.state) + "  " + str(state))
 		
 		# for traffic light position testing
-		return light.state
+		return state #light.state
+
 	def process_traffic_lights(self):
 		"""Finds closest visible traffic light, if one exists, and determines its
 			location and color
