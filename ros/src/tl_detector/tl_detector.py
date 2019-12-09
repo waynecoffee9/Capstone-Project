@@ -11,7 +11,6 @@ from scipy.spatial import KDTree
 import tf
 import cv2
 import yaml
-import matplotlib.pyplot as plt
 
 STATE_COUNT_THRESHOLD = 3 # consecutive traffic light state change
 
