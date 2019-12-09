@@ -43,7 +43,7 @@ class TLClassifier(object):
         self.tlclasses_d = { TrafficLight.RED: "RED", TrafficLight.YELLOW:"YELLOW", TrafficLight.GREEN:"GREEN", TrafficLight.UNKNOWN:"UNKNOWN" }
 #        self.tlclasses = [ 0, 1, 2 ]
 #        self.tlclasses_d = { 0 : "RED", 1:"YELLOW", 2:"GREEN", -1:"UNKNOWN" }
-
+        print("TLClassifier Ready.")
         pass
 
     def filter_boxes(self, min_score, boxes, scores, classes):
@@ -249,4 +249,3 @@ if __name__ == '__main__':
         #             image = cv2.imread(image_dict['path'])
         #             status = cl.get_classification( image )
         #             print( cl.tlclasses_d[status], ',', box['label'])
-
