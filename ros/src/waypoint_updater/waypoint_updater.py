@@ -57,7 +57,7 @@ class WaypointUpdater(object):
 		rospy.spin()
 
 	def loop(self):
-		rate = rospy.Rate(15) #15Hz
+		rate = rospy.Rate(5) #4Hz
 		while not rospy.is_shutdown():
 			if self.pose and self.base_waypoints:
 				#get closest waypoint
@@ -88,7 +88,7 @@ class WaypointUpdater(object):
 	def publish_waypoints(self, closest_idx):
 		final_lane = self.generate_lane()
 		final_lane.header = self.base_waypoints.header
-		# pick every other waypoint to reduce overhead computing
+		# pick every other waypoint to reduce overhead
 		final_lane.waypoints = final_lane.waypoints[0::2]
 		self.final_waypoints_pub.publish(final_lane)
 
@@ -187,5 +187,4 @@ if __name__ == '__main__':
 		WaypointUpdater()
 	except rospy.ROSInterruptException:
 		rospy.logerr('Could not start waypoint updater node.')
-
 
