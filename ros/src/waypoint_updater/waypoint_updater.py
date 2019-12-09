@@ -25,8 +25,8 @@ TODO (for Yousuf and Aaron): Stopline location for each traffic light.
 '''
 
 LOOKAHEAD_WPS = 100 # Number of waypoints we will publish. You can change this number
-MAX_DECEL = 0.35 #max deceleration factor used to update waypoints
-MIN_STOP_TIME = 2.5 #minimum brake time
+MAX_DECEL = 0.3 #max deceleration factor used to update waypoints
+MIN_STOP_TIME = 3.0 #minimum brake time
 
 class WaypointUpdater(object):
 	def __init__(self):
