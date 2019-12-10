@@ -28,22 +28,32 @@ labels = []
 
 
 
-for i in range(1):
-    paths = glob(os.path.join('dataset_train_rgb/rgb/train/prep/Red', '*.png'))
-    for path in paths:
-        img = cv2.imread(path)
-        features.append(img)
-        labels.append( categories[0] )
-    paths = glob(os.path.join('dataset_train_rgb/rgb/train/prep/Yellow', '*.png'))
-    for path in paths:
-        img = cv2.imread(path)
-        features.append(img)
-        labels.append( categories[1] )
-    paths = glob(os.path.join('dataset_train_rgb/rgb/train/prep/Green', '*.png'))
-    for path in paths:
-        img = cv2.imread(path)
-        features.append(img)
-        labels.append( categories[2] )
+#for i in range(1):
+#    paths = glob(os.path.join('dataset_train_rgb/rgb/train/prep/Red', '*.png'))
+#    for path in paths:
+#        img = cv2.imread(path)
+#        features.append(img)
+#        labels.append( categories[0] )
+#    paths = glob(os.path.join('dataset_train_rgb/rgb/train/prep/Yellow', '*.png'))
+#    for path in paths:
+#        img = cv2.imread(path)
+#        features.append(img)
+#        labels.append( categories[1] )
+#    paths = glob(os.path.join('dataset_train_rgb/rgb/train/prep/Green', '*.png'))
+#    for path in paths:
+#        img = cv2.imread(path)
+#        features.append(img)
+#        labels.append( categories[2] )
+
+LABEL_FILE = '/home/student/code/traffic_light_bag_file_out/labels.csv'
+with open(LABEL_FILE) as csv_file:
+	csv_reader = csv.reader(csv_file, delimiter=',')
+	for row in csv_reader:
+		print(row[0])
+		img = cv2.imread(os.path.join('/home/student/code/traffic_light_bag_file_out',row[0])+'.jpg')
+		img = cv2.resize(img, (32,32))
+		features.append(img)
+		labels.append(categories[int(row[1])])
 
 features = np.array(features)
 labels = np.array( labels)
