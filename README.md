@@ -38,5 +38,14 @@ roslaunch launch/styx.launch
 ```
 4. Run the simulator
 
-## Status
-The car can run and stop at red light with ground truth red light signal from the simulator.  Next step is to train a model to classify the lights.
+### Code Structure
+
+The code and folder structures follow the basic pipeline provided by Udacity as shown below.
+
+![pipeline](imgs/pipeline.png)
+
+### Results
+
+Our car is able to smoothly follow waypoints at speed limit, dectect traffic light signals using object detection and image classifier to stop the car before stopline at very smooth and comfortable deceleration.  Video linke is below:
+
+[![Video image](http://img.youtube.com/vi/2w_00uRn1ec/0.jpg)](http://www.youtube.com/watch?v=2w_00uRn1ec)
