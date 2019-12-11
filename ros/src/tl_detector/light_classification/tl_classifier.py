@@ -1,5 +1,5 @@
-import rospy
-from styx_msgs.msg import TrafficLight
+#import rospy
+#from styx_msgs.msg import TrafficLight
 import tensorflow as tf
 from PIL import Image
 import cv2
@@ -25,11 +25,13 @@ class TLClassifier(object):
         # load keras Lenet style model from file
         if self.is_site is True:
             self.class_model = load_model(cwd+'/model/model.h5')
+	    self.dg = self.load_graph(cwd+"/model/frozen_inference_graph_rfcn_resnet101.pb")
         else:
             self.class_model = load_model(cwd+'/model/model_sim.h5')
-        self.class_graph = tf.get_default_graph()
+	    self.dg = self.load_graph(cwd+"/model/frozen_inference_graph_mobilenet.pb")
+        
+	self.class_graph = tf.get_default_graph()
 
-        self.dg = self.load_graph(cwd+"/model/frozen_inference_graph.pb")
         
         #get names of nodes. from https://www.activestate.com/blog/2017/08/using-pre-trained-models-tensorflow-go
         self.session = tf.Session(graph=self.dg )
@@ -39,10 +41,10 @@ class TLClassifier(object):
         self.detection_classes = self.dg.get_tensor_by_name('detection_classes:0')
         self.num_detections    = self.dg.get_tensor_by_name('num_detections:0')
 
-        self.tlclasses = [ TrafficLight.RED, TrafficLight.YELLOW, TrafficLight.GREEN ]
-        self.tlclasses_d = { TrafficLight.RED: "RED", TrafficLight.YELLOW:"YELLOW", TrafficLight.GREEN:"GREEN", TrafficLight.UNKNOWN:"UNKNOWN" }
-#        self.tlclasses = [ 0, 1, 2 ]
-#        self.tlclasses_d = { 0 : "RED", 1:"YELLOW", 2:"GREEN", -1:"UNKNOWN" }
+#        self.tlclasses = [ TrafficLight.RED, TrafficLight.YELLOW, TrafficLight.GREEN ]
+#        self.tlclasses_d = { TrafficLight.RED: "RED", TrafficLight.YELLOW:"YELLOW", TrafficLight.GREEN:"GREEN", TrafficLight.UNKNOWN:"UNKNOWN" }
+        self.tlclasses = [ 0, 1, 2 ]
+        self.tlclasses_d = { 0 : "RED", 1:"YELLOW", 2:"GREEN", -1:"UNKNOWN" }
         print("TLClassifier Ready.")
         pass
 
@@ -80,7 +82,7 @@ class TLClassifier(object):
         """
         box = self.localize_lights( image )
         if box is None:
-            return TrafficLight.UNKNOWN
+            return -1#TrafficLight.UNKNOWN
         class_image = cv2.resize( image[box[0]:box[2], box[1]:box[3]], (32,32) )
         return self.classify_lights( class_image )
 
@@ -91,7 +93,7 @@ class TLClassifier(object):
             Expects images in BGR format. Important otherwide won't classify correctly
             
         """
-        status = TrafficLight.UNKNOWN
+        status = -1#TrafficLight.UNKNOWN
         img_resize = np.expand_dims(image, axis=0).astype('float32')
         with self.class_graph.as_default():
             predict = self.class_model.predict(img_resize)
@@ -232,10 +234,10 @@ if __name__ == '__main__':
                     print( cl.tlclasses_d[status], ',', box['label'])
 
     if False:
-        cl = TLClassifier(False)
+        cl = TLClassifier(True)
         # input_yaml = sys.argv[1]
         # images = get_all_labels(input_yaml)
-        paths = glob(os.path.join('test/', '*.jpg'))
+        paths = glob(os.path.join('/home/robond/Downloads/ros_bag/', '*.jpg'))
         for path in paths:
             img = cv2.imread(path)
             status = cl.get_classification( img )
