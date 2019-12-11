@@ -44,7 +44,7 @@ class TLClassifier(object):
 #        self.tlclasses = [ TrafficLight.RED, TrafficLight.YELLOW, TrafficLight.GREEN ]
 #        self.tlclasses_d = { TrafficLight.RED: "RED", TrafficLight.YELLOW:"YELLOW", TrafficLight.GREEN:"GREEN", TrafficLight.UNKNOWN:"UNKNOWN" }
         self.tlclasses = [ 0, 1, 2 ]
-        self.tlclasses_d = { 0 : "RED", 1:"YELLOW", 2:"GREEN", -1:"UNKNOWN" }
+        self.tlclasses_d = { 0 : "RED", 1:"YELLOW", 2:"GREEN", 4:"UNKNOWN" }
         print("TLClassifier Ready.")
         pass
 
@@ -82,7 +82,7 @@ class TLClassifier(object):
         """
         box = self.localize_lights( image )
         if box is None:
-            return -1#TrafficLight.UNKNOWN
+            return 4#TrafficLight.UNKNOWN
         class_image = cv2.resize( image[box[0]:box[2], box[1]:box[3]], (32,32) )
         return self.classify_lights( class_image )
 
@@ -93,7 +93,7 @@ class TLClassifier(object):
             Expects images in BGR format. Important otherwide won't classify correctly
             
         """
-        status = -1#TrafficLight.UNKNOWN
+        status = 4#TrafficLight.UNKNOWN
         img_resize = np.expand_dims(image, axis=0).astype('float32')
         with self.class_graph.as_default():
             predict = self.class_model.predict(img_resize)
