@@ -41,12 +41,38 @@ The code and folder structures follow the basic pipeline provided by Udacity as 
 
 Like the name suggests, this node first processes the base waypoints of the map, current position of the car, and traffic light state.  Then, propose a set of waypoints for the car to follow.  To save overhead computation, we shortened the number of waypoints to 100, and also removed every other waypoint before publishing them.  When coming close to a yellow/red light, the node checks for its current velocity and distance to the stopline, and calculate appropriate deceleration rate.  If the traffic light just turns yellow when the car is approaching, the node will determine if the distance is long enough to brake safely.
 
-### twist_controller node
+### dbw node
 
-Our code contains two PID controllers, one for throttle, and one for brake.  The throttle PID is mostly limited by the maximum throttle set in the code so the acceleration is very smooth and comfortable.  For brake PID, we use a set of parameters that will provide smooth and comfortable deceleration, which can be observed in the vdieo provided in the Results section.
+Our code contains two PID controllers, one for throttle, and one for brake.  The throttle PID is mostly limited by the maximum throttle set in the code so the acceleration is very smooth and comfortable.  For brake PID, we use a set of parameters that will provide smooth and comfortable deceleration, which can be observed in the vdieo provided in the Results section.  Below are our PID parameters proven to be very smooth on acceleration/deceleration.
+
+Throttle:
+```
+Kp = 0.1
+Ki = 0.02
+Kd = 0.0
+mn = 0.0 #min throttle
+mx = 0.23 #max throttle
+```
+Brake:
+```
+Kp_b = 60.0
+Ki_b = 0.0
+Kd_b = 10.0
+mn_b = 0.0 #min brake
+MAX_BRAKE = 700
+```
+
+### waypoint_follower node
+
+The waypoint follower from the starter code results in car steering right and left around the waypoints.  This is the result from having higher thresholds before waypoint follower corrects itself to follow the waypoints.  We modified the parameters under ```pure_pursuit_core.h``` under waypoint_follower node.  With the modified parameters as below, the wobbling steering is reduced while the burden on overhead computing is still reasonable.
+
+```
+displacement_threshold_(0.1)
+relative_angle_threshold_(2.0)
+```
+
 
 ### tl_detector node
-
 
 
 
