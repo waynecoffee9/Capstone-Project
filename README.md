@@ -56,8 +56,7 @@ RFCN ResNet is more power and accurate, but it takes more computation power to r
 ## Notes to Reviewer
 The team:
 
-1. Kibaek Jeong
-2. Danfeng Xu
-3. Roopak Ingole
-4. Ying Tang
-5. Wayne Chen
+Danfeng Xu (danfenx@g.clemson.edu)
+Roopak Ingole (roopak.ingole@gmail.com)
+Ying Tang (tangtang_com@hotmail.com)
+Wayne Chen (waynecoffee@hotmail.com)
