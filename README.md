@@ -37,6 +37,21 @@ The code and folder structures follow the basic pipeline provided by Udacity as 
 
 ![pipeline](imgs/pipeline.png)
 
+### waypoint_updater node
+
+Like the name suggests, this node first processes the base waypoints of the map, current position of the car, and traffic light state.  Then, propose a set of waypoints for the car to follow.  To save overhead computation, we shortened the number of waypoints to 100, and also removed every other waypoint before publishing them.  When coming close to a yellow/red light, the node checks for its current velocity and distance to the stopline, and calculate appropriate deceleration rate.  If the traffic light just turns yellow when the car is approaching, the node will determine if the distance is long enough to brake safely.
+
+### twist_controller node
+
+Our code contains two PID controllers, one for throttle, and one for brake.  The throttle PID is mostly limited by the maximum throttle set in the code so the acceleration is very smooth and comfortable.  For brake PID, we use a set of parameters that will provide smooth and comfortable deceleration, which can be observed in the vdieo provided in the Results section.
+
+### tl_detector node
+
+
+
+
+
+
 ## Results
 
 ### styx.launch
