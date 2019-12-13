@@ -29,7 +29,7 @@ catkin_make
 source devel/setup.sh
 roslaunch launch/styx.launch
 ```
-4. Run the simulator
+5. Run the simulator
 
 ## Code Structure
 
@@ -43,7 +43,7 @@ Like the name suggests, this node first processes the base waypoints of the map,
 
 ### dbw node
 
-Our code contains two PID controllers, one for throttle, and one for brake.  The throttle PID is mostly limited by the maximum throttle set in the code so the acceleration is very smooth and comfortable.  For brake PID, we use a set of parameters that will provide smooth and comfortable deceleration, which can be observed in the vdieo provided in the Results section.  Below are our PID parameters proven to be very smooth on acceleration/deceleration.
+Our code contains two PID controllers, one for throttle, and one for brake.  The throttle PID is mostly limited by the maximum throttle set in the code so the acceleration is very smooth and comfortable.  For brake PID, we use a set of parameters that will provide smooth and comfortable deceleration, which can be observed in the video provided in the Results section.  Below are our PID parameters proven to be very smooth on acceleration/deceleration.
 
 Throttle:
 ```
@@ -71,7 +71,6 @@ displacement_threshold_(0.1)
 relative_angle_threshold_(2.0)
 ```
 
-
 ### tl_detector node
 
 
@@ -82,7 +81,7 @@ relative_angle_threshold_(2.0)
 
 ### styx.launch
 
-Our car is able to smoothly follow waypoints at speed limit, dectect traffic light signals using object detection and image classifier to stop the car before stopline at very smooth and comfortable deceleration.  Video linke is below:
+Our car is able to smoothly follow waypoints at speed limit, detect traffic light signals using object detection and image classifier to stop the car before stopline at very smooth and comfortable deceleration.  Video link is below:
 
 [![Video image](http://img.youtube.com/vi/2w_00uRn1ec/0.jpg)](http://www.youtube.com/watch?v=2w_00uRn1ec)
 
