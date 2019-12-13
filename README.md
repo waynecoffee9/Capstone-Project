@@ -72,10 +72,36 @@ relative_angle_threshold_(2.0)
 ```
 
 ### tl_detector node
+We divided the job of tl_detector in two parts.
+1. Find the bounding box for traffic light in the incoming image.
+2. Find color of signal in the extracted bounding box.
 
+#### 1. Find bounding box for Traffic Signal
+Based on exercises in object detection lab, we found various pre-trained models from TensorFlow's Model zoo extremely useful to detect and extract Traffic signal from the image. 
+All these models are pre-trained on COCC data set and can be useful for out-of-the-box inference if you are interested in categories already in COCO (e.g., humans, cars, etc). 
+We experimented with different models from zoo on accuracy and speed of detection. We found 
+ssd_mobilenet model performed best for the images from Simulator, however it was not able to detect the traffic lights in Udacity's track images. We decided to use different models for site vs. simulator. After exploration, we found rfcn_resnet101 was good enough compromise on accuracy and speed.
 
+![SimImg](imgs/sim.png)
+![SiteImg](imgs/site.png)
 
+**Output filtering and transformation**
 
+The output of the inferring step is a bounding box that marks the part of the image. We then resize it to 32x32x3 and feed into the classifier.
+
+#### 2. Traffic Sign Color Classifier
+The classifier takes as input the previous selected region by the inference process and determines the light color {RED, YELLOW, GREEN}
+
+**Choosing a simple CNN**
+
+Given that there are only three classes to choose from, and there is substantial similarity between the input samples, it makes sense to use a simple CNN for the classification task. As such we use a LeNet style CNN programmed in keras. This is the graph of the CNN:
+
+![CNN Graph](imgs/model.png)
+
+**Training CNN**
+
+We trained this CNN on two separate dataset and generated two models for simulator and site.
+We extracted around 5000 images from Simulator and 2000 images from Udacity ros-bag and trained them separately. We trained the CNN on 52 epochs and 30% validation split and validation loss < 0.001.
 
 ## Results
 
