@@ -28,18 +28,6 @@ class TLDetector(object):
 		self.lights = []
 		self.last_time = rospy.get_time()
 		self.tlclasses_d = { 0 : "\033[1;31mRED\033[0;0m", 1:"\033[1;33mYELLOW\033[0;0m", 2:"\033[1;32mGREEN\033[0;0m", 4:"UNKNOWN" }
-		sub1 = rospy.Subscriber('/current_pose', PoseStamped, self.pose_cb)
-		sub2 = rospy.Subscriber('/base_waypoints', Lane, self.waypoints_cb)
-
-		'''
-		/vehicle/traffic_lights provides you with the location of the traffic light in 3D map space and
-		helps you acquire an accurate ground truth data source for the traffic light
-		classifier by sending the current color state of all traffic lights in the
-		simulator. When testing on the vehicle, the color state will not be available. You'll need to
-		rely on the position of the light and the camera image to predict it.
-		'''
-		sub3 = rospy.Subscriber('/vehicle/traffic_lights', TrafficLightArray, self.traffic_cb)
-		sub6 = rospy.Subscriber('/image_color', Image, self.image_cb)
 
 		config_string = rospy.get_param("/traffic_light_config")
 		self.config = yaml.load(config_string)
@@ -55,6 +43,18 @@ class TLDetector(object):
 		self.last_state = TrafficLight.UNKNOWN
 		self.last_wp = -1
 		self.state_count = 0
+
+		sub1 = rospy.Subscriber('/current_pose', PoseStamped, self.pose_cb)
+		sub2 = rospy.Subscriber('/base_waypoints', Lane, self.waypoints_cb)
+		'''
+		/vehicle/traffic_lights provides you with the location of the traffic light in 3D map space and
+		helps you acquire an accurate ground truth data source for the traffic light
+		classifier by sending the current color state of all traffic lights in the
+		simulator. When testing on the vehicle, the color state will not be available. You'll need to
+		rely on the position of the light and the camera image to predict it.
+		'''
+		sub3 = rospy.Subscriber('/vehicle/traffic_lights', TrafficLightArray, self.traffic_cb)
+		sub6 = rospy.Subscriber('/image_color', Image, self.image_cb)
 
 		rospy.spin()
 
@@ -80,7 +80,7 @@ class TLDetector(object):
 		"""
 		if not hasattr(self, 'light_classifier'):
 			return
-		if rospy.get_time() - self.last_time > 0.35: # limit how fast classifier runs to save overhead.
+		if rospy.get_time() - self.last_time > 0.07 and not self.waypoint_tree==None: # limit how fast classifier runs to save overhead.
 			self.last_time = rospy.get_time()
 			rospy.wait_for_message('/base_waypoints', Lane)
 			self.has_image = True
