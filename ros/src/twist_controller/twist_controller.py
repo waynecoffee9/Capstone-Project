@@ -64,11 +64,12 @@ class Controller(object):
 		throttle = self.throttle_controller.step(vel_error, sample_time)
 		brake = 0
 		# when car is supposed to stop and current velocity is small, throw on max brake
-		if linear_vel < 0.4 and current_vel < 0.4:
+
+		if linear_vel < 0.1 and current_vel < 0.4:
 			throttle = 0
 			brake = MAX_BRAKE
 		# when car is going faster than target speed, let go off throttle and apply brake
-		elif throttle < 0.1 and vel_error < 0:
+		elif throttle < 0.1 and vel_error < 0.0:
 			throttle = 0
 			brake = self.brake_controller.step(-vel_error, sample_time)
 		
