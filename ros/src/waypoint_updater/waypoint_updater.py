@@ -31,6 +31,15 @@ MIN_STOP_TIME = 3.0 #minimum brake time
 class WaypointUpdater(object):
 	def __init__(self):
 		rospy.init_node('waypoint_updater')
+
+		# TODO: Add other member variables you need below
+		self.stopline_wp_idx = -1
+		self.pose = None
+		self.base_waypoints = None
+		self.waypoints_2d = None
+		self.waypoint_tree = None
+		self.is_braking = False
+
 		# wait for message before initializing rest of the code.
 		rospy.wait_for_message('/current_pose', PoseStamped)
 		rospy.wait_for_message('/base_waypoints', Lane)
@@ -43,21 +52,13 @@ class WaypointUpdater(object):
 		rospy.Subscriber('/current_velocity', TwistStamped, self.velocity_cb)
 
 		self.final_waypoints_pub = rospy.Publisher('final_waypoints', Lane, queue_size=1)
-
-		# TODO: Add other member variables you need below
-		self.stopline_wp_idx = -1
-		self.pose = None
-		self.base_waypoints = None
-		self.waypoints_2d = None
-		self.waypoint_tree = None
-		self.is_braking = False
 		
 		self.loop()
 		
 		rospy.spin()
 
 	def loop(self):
-		rate = rospy.Rate(5) #5Hz
+		rate = rospy.Rate(15) #15Hz
 		while not rospy.is_shutdown():
 			if self.pose and self.base_waypoints:
 				#get closest waypoint
@@ -89,7 +90,7 @@ class WaypointUpdater(object):
 		final_lane = self.generate_lane()
 		final_lane.header = self.base_waypoints.header
 		# pick every other waypoint to reduce overhead
-		final_lane.waypoints = final_lane.waypoints[0::2]
+		#final_lane.waypoints = final_lane.waypoints[0::2]
 		self.final_waypoints_pub.publish(final_lane)
 
 	def generate_lane(self):
@@ -143,12 +144,11 @@ class WaypointUpdater(object):
 	def pose_cb(self, msg):
 		# TODO: Implement
 		self.pose = msg
-		pass
 
 	def waypoints_cb(self, waypoints):
 		# TODO: Implement
 		
-		if not self.waypoints_2d:
+		if self.waypoints_2d == None:
 			self.waypoints_2d = [[waypoint.pose.pose.position.x, waypoint.pose.pose.position.y] for waypoint in waypoints.waypoints]
 			self.waypoint_tree = KDTree(self.waypoints_2d)
 		if self.base_waypoints == None:
@@ -156,12 +156,10 @@ class WaypointUpdater(object):
 		# base waypoints only needs to be called once, so we can stop subscribing from the topic once we have them
 		if self.base_waypoints and self.waypoints_2d:
 			self.base_waypoints_sub.unregister()
-		pass
 
 	def traffic_cb(self, msg):
 		# TODO: Callback for /traffic_waypoint message. Implement
 		self.stopline_wp_idx = msg.data
-		pass
 
 	def obstacle_cb(self, msg):
 		# TODO: Callback for /obstacle_waypoint message. We will implement it later
